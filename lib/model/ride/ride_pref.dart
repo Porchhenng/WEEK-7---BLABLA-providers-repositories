@@ -10,28 +10,30 @@ class RidePreference {
   final Location arrival;
   final int requestedSeats;
 
-  const RidePreference(
-      {required this.departure,
-      required this.departureDate,
-      required this.arrival,
-      required this.requestedSeats});
-
-  RidePreference.copy(RidePreference other)
-      : departure = other.departure,
-        departureDate = other.departureDate,
-        arrival = other.arrival,
-        requestedSeats = other.requestedSeats;
+  const RidePreference({
+    required this.departure,
+    required this.departureDate,
+    required this.arrival,
+    required this.requestedSeats,
+  });
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
     return other is RidePreference &&
         other.departure == departure &&
-        other.arrival == arrival;
+        other.departureDate == departureDate &&
+        other.arrival == arrival &&
+        other.requestedSeats == requestedSeats;
   }
 
   @override
-  int get hashCode => departure.hashCode ^ arrival.hashCode;
+  int get hashCode =>
+      departure.hashCode ^
+      departureDate.hashCode ^
+      arrival.hashCode ^
+      requestedSeats.hashCode;
 
   @override
   String toString() {

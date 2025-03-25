@@ -56,7 +56,7 @@ class RidePrefService {
 
   // Past preferences
   List<RidePreference> getPastPreferences() {
-    return repository.getPastPreferences();
+    return repository.fetchPastPreferences();
   }
 
   void addPreference(RidePreference preference) {

@@ -7,7 +7,7 @@ class MockRidePreferencesRepository extends RidePreferencesRepository {
   final List<RidePreference> _pastPreferences = fakeRidePrefs;
 
   @override
-  List<RidePreference> getPastPreferences() {
+  List<RidePreference> fetchPastPreferences() {
     return _pastPreferences;
   }
 
