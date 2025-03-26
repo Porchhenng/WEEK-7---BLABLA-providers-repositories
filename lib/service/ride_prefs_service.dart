@@ -6,6 +6,7 @@ import '../repository/ride_preferences_repository.dart';
 ///   - The past ride preferences
 ///   - The currennt ride preferences
 ///
+@Deprecated('To be removed, use provider instead')
 class RidePrefService {
   // Static private instance
   static RidePrefService? _instance;
@@ -55,11 +56,11 @@ class RidePrefService {
   }
 
   // Past preferences
-  List<RidePreference> getPastPreferences() {
-    return repository.fetchPastPreferences();
-  }
+  // List<RidePreference> getPastPreferences() {
+  //   return repository.fetchPastPreferences();
+  // }
 
-  void addPreference(RidePreference preference) {
-    return repository.addPreference(preference);
-  }
+  // void addPreference(RidePreference preference) {
+  //   return repository.addPreference(preference);
+  // }
 }

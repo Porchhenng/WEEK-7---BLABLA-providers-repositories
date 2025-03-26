@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Import the provider package
+import 'package:week_3_blabla_project/service/rides_service.dart';
 import 'package:week_3_blabla_project/ui/providers/ride_preference_providers.dart';
 import '../../../model/ride/ride_filter.dart';
 import 'widgets/ride_pref_bar.dart';
-import '../../../service/ride_prefs_service.dart';
+
 
 import '../../../model/ride/ride.dart';
 import '../../../model/ride/ride_pref.dart';
-import '../../../service/rides_service.dart';
+
 import '../../theme/theme.dart';
 import '../../../utils/animations_util.dart';
 import 'widgets/ride_pref_modal.dart';

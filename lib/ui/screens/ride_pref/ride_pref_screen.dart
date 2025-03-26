@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:week_3_blabla_project/ui/providers/async_value.dart';
 import 'package:week_3_blabla_project/ui/providers/ride_preference_providers.dart';
+import 'package:week_3_blabla_project/ui/screens/rides/widgets/bla_error_screen%20(2).dart';
 
 import '../../../model/ride/ride_pref.dart';
-import '../../../service/ride_prefs_service.dart';
+
 import '../../theme/theme.dart';
 
 import '../../../utils/animations_util.dart';
@@ -21,9 +23,7 @@ const String blablaHomeImagePath = 'assets/images/blabla_home.png';
 class RidePrefScreen extends StatelessWidget {
   const RidePrefScreen({super.key});
 
-
-  void  onRidePrefSelected(BuildContext context,RidePreference? newPreference) async {
-   
+  void onRidePrefSelected(BuildContext context, RidePreference? newPreference) async {
     // 1 - Call the RidesPreferencesProvider to set the current preference
     Provider.of<RidesPreferencesProvider>(context, listen: false)
         .setCurrentPreferrence(newPreference);
@@ -31,20 +31,48 @@ class RidePrefScreen extends StatelessWidget {
     // 2 - Navigate to the rides screen (with a bottom to top animation)
     await Navigator.of(context)
         .push(AnimationUtils.createBottomToTopRoute(RidesScreen()));
+  }
 
+  @override
+  Widget _buildPastPrefsList(BuildContext context) {
+    RidesPreferencesProvider ridePrefsProvider =
+        context.read<RidesPreferencesProvider>();
+    AsyncValue<List<RidePreference>> value = ridePrefsProvider.preferencesHistory;
+
+    // Check the state of the AsyncValue object
+    switch (value.state) {
+      case AsyncValueState.loading:
+        return Text(' fetching data');
+      case AsyncValueState.error:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => BlaError(message: 'error')));
+        return Text('error no fetch');
+      case AsyncValueState.success:
+        return SizedBox(
+          height: 200,
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: AlwaysScrollableScrollPhysics(),
+            itemCount: value.data!.length,
+            itemBuilder: (ctx, index) => RidePrefHistoryTile(
+              ridePref: value.data![index],
+              onPressed: () => onRidePrefSelected(context, value.data![index]),
+            ),
+          ),
+        );
+      case AsyncValueState.empty:
+        return Text('empty');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentRidePreference =
-        Provider.of<RidesPreferencesProvider>(context).currentPreference;
-    final pastPreferences =
-        Provider.of<RidesPreferencesProvider>(context).preferencesHistory;
+    final provider = Provider.of<RidesPreferencesProvider>(context);
 
+ 
     return Stack(
       children: [
-        // 1 - Background  Image
-        BlaBackground(),
+        // 1 - Background Image
+        const BlaBackground(),
 
         // 2 - Foreground content
         Column(
@@ -55,37 +83,32 @@ class RidePrefScreen extends StatelessWidget {
               style: BlaTextStyles.heading.copyWith(color: Colors.white),
             ),
             SizedBox(height: 100),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: BlaSpacings.xxl),
-              decoration: BoxDecoration(
-                color: Colors.white, // White background
-                borderRadius: BorderRadius.circular(16), // Rounded corners
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // 2.1 Display the Form to input the ride preferences
-                  RidePrefForm(
-                      initialPreference: currentRidePreference,
-                      onSubmit:  (newPreference) => onRidePrefSelected(context, newPreference)),
-                  SizedBox(height: BlaSpacings.m),
-
-                  // 2.2 Optionally display a list of past preferences
-                  SizedBox(
-                    height: 200, // Set a fixed height
-                    child: ListView.builder(
-                      shrinkWrap: true, // Fix ListView height issue
-                      physics: AlwaysScrollableScrollPhysics(),
-                      itemCount: pastPreferences.length,
-                      itemBuilder: (ctx, index) => RidePrefHistoryTile(
-                        ridePref: pastPreferences[index],
-                        onPressed: () =>
-                            () => onRidePrefSelected(context, pastPreferences[index]),
-                      ),
+            // Ensure the container uses available space
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: BlaSpacings.xxl),
+                decoration: BoxDecoration(
+                  color: Colors.white, // White background
+                  borderRadius: BorderRadius.circular(16), // Rounded corners
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 2.1 Display the Form to input the ride preferences
+                    RidePrefForm(
+                      initialPreference: provider.currentPreference,
+                      onSubmit: (newPreference) =>
+                          provider.setCurrentPreferrence(newPreference),
                     ),
-                  ),
-                ],
+                    SizedBox(height: BlaSpacings.m),
+
+                    // Display the past preferences list
+                    _buildPastPrefsList(context),
+                    
+                   
+                  ],
+                ),
               ),
             ),
           ],
@@ -94,6 +117,7 @@ class RidePrefScreen extends StatelessWidget {
     );
   }
 }
+
 
 class BlaBackground extends StatelessWidget {
   const BlaBackground({super.key});
